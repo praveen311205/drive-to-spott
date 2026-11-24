@@ -28,7 +28,9 @@ FIELD_MAP = {
     "next_step": "Next step", "sector": "Sector sold to",
 }
 # tolerate label drift between the written standard and Spott's labels
-ALIASES = {"Sales leader": "Sales Leader", "Team lead": "Team Lead", "Mid-Market": "Mid-market"}
+ALIASES = {"Sales leader": "Sales Leader", "Team lead": "Team Lead", "Mid-Market": "Mid-market",
+           "Swedish": "Nordic (Swedish/Danish/Norwegian)", "Danish": "Nordic (Swedish/Danish/Norwegian)",
+           "Norwegian": "Nordic (Swedish/Danish/Norwegian)"}
 # Spott full industry label -> consolidated "Sector sold to" bucket
 SECTOR_BUCKETS = {
     "Software Development": "Software Development", "IT Services and IT Consulting": "IT Services and IT Consulting",
@@ -58,7 +60,10 @@ SECTOR_BUCKETS = {
 
 
 def main():
-    defs = {d["label"]: d for d in json.load(open(os.path.join(STATE, "custom_fields.json")))["custom_fields_candidate"]["items"]}
+    # duplicate labels (e.g. an old and a rebuilt "Sector sold to"): the most recently created field wins
+    items = sorted(json.load(open(os.path.join(STATE, "custom_fields.json")))["custom_fields_candidate"]["items"],
+                   key=lambda d: d.get("createdAt") or "")
+    defs = {d["label"]: d for d in items}
     groups = defaultdict(set)   # (label, json(value)) -> candidate ids
     rejects, seen = [], set()
     files = sorted(glob.glob(os.path.join(STATE, "profiles_*.jsonl")))
