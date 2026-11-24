@@ -1,0 +1,38 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__Google_Drive__search_files",
+      "mcp__Google_Drive__get_file_metadata",
+      "mcp__Google_Drive__read_file_content",
+      "mcp__Google_Drive__download_file_content",
+      "mcp__Spott__spott_whoami",
+      "mcp__Spott__spott_list_enums",
+      "mcp__Spott__spott_quick_lookup",
+      "mcp__Spott__spott_search_records",
+      "mcp__Spott__spott_get_records_by_ids",
+      "mcp__Spott__spott_get_candidate_contact_identifiers",
+      "mcp__Spott__spott_get_notes_for_record",
+      "mcp__Spott__spott_import_candidate_from_cv",
+      "mcp__Spott__spott_create_candidate",
+      "mcp__Spott__spott_update_candidate",
+      "mcp__Spott__spott_add_note",
+      "mcp__Spott__spott_set_custom_field",
+      "mcp__Spott__spott_add_to_list",
+      "Bash(./upload_cv.sh *)",
+      "Bash(python3 classify.py *)",
+      "Bash(python3 plan_fields.py*)",
+      "Bash(jq *)",
+      "Bash(wc *)",
+      "Edit(state/**)",
+      "Edit(batches/**)"
+    ],
+    "deny": [
+      "mcp__Spott__spott_send_email",
+      "mcp__Spott__spott_enroll_in_campaign",
+      "mcp__Spott__spott_delete_list",
+      "mcp__Google_Drive__trash_file",
+      "mcp__Google_Drive__share_file",
+      "mcp__Google_Drive__update_file"
+    ]
+  }
+}

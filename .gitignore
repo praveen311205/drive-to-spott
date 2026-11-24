@@ -1,0 +1,5 @@
+# candidate data stays out of git (personal data)
+state/
+batches/
+*.pdf
+*.docx
