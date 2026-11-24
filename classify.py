@@ -40,7 +40,7 @@ CALL_RX = re.compile(r"(notes by gemini|^notes\b|meeting|intro:|catch up|follow-
 STRIP_RX = [
     r"\.(pdf|docx?|txt)$", r"\.(pdf|docx?)", r"\(\d+\)", r"\b(cv|resume|résumé|curriculum vitae)\b",
     r"\b(docx?|pdf|final|updated|newest version|new|english|eng|one page|full|v\d+|full skills)\b",
-    r"\b(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\b", r"\b(19|20)\d{2}\b", r"\b\d{3,}\b",
+    r"\bjan\b(?=\s*\d)", r"\b(feb|mar|apr|jun|jul|aug|sep|sept|oct|nov|dec|january|february|march|april|june|july|september|october|november|december)\b", r"\b(19|20)\d{2}\b", r"\b\d{3,}\b",
     r"\d+(st|nd|rd|th)\b", r"[_\-–,\[\]().']", r"\s+",
 ]
 
