@@ -20,7 +20,7 @@ INCLUDE_SECTOR = "--include-sector" in sys.argv
 
 # staging key -> Spott field label
 FIELD_MAP = {
-    "function": "Function", "seniority": "Seniority", "segment": "Segment Sold to",
+    "function": "Function", "seniority": "Seniority", "segment": "Segment sold to",
     "rip_and_replace": "Rip-and-replace", "rip_and_replace_incumbent": "Rip-and-replace incumbent",
     "base": "Base", "ote": "OTE", "currency": "Currency", "notice_period": "Notice period",
     "work_setup": "Work setup", "work_rights": "Work rights", "languages": "Language",
