@@ -38,10 +38,11 @@ def call(method, path, body=None, raw=None, ctype="application/json"):
             raise RuntimeError(f"{method} {path} -> {e.code} {e.read()[:300].decode(errors='ignore')}")
 
 
-def multipart(field, fname, blob):
+def multipart(field, fname, blob, extra=None):
     b = uuid.uuid4().hex
+    pre = "".join(f"--{b}\r\nContent-Disposition: form-data; name=\"{k}\"\r\n\r\n{v}\r\n" for k, v in (extra or {}).items()).encode()
     ct = "application/pdf" if blob[:4] == b"%PDF" else ("application/vnd.openxmlformats-officedocument.wordprocessingml.document" if blob[:2] == b"PK" else "application/msword")
-    body = (f"--{b}\r\nContent-Disposition: form-data; name=\"{field}\"; filename=\"{fname}\"\r\nContent-Type: {ct}\r\n\r\n").encode() + blob + f"\r\n--{b}--\r\n".encode()
+    body = pre + (f"--{b}\r\nContent-Disposition: form-data; name=\"{field}\"; filename=\"{fname}\"\r\nContent-Type: {ct}\r\n\r\n").encode() + blob + f"\r\n--{b}--\r\n".encode()
     return body, f"multipart/form-data; boundary={b}"
 
 
@@ -151,9 +152,10 @@ for r in plan:
         if r["action"] == "merge" and cvs:
             att = call("GET", "/attachments?" + urllib.parse.urlencode({"candidateId": cid})).get("items", [])
             if not att:
-                body, ct = multipart("files", os.path.basename(cvs[0]), open(cvs[0], "rb").read())
-                up = call("POST", "/attachments/temporary", raw=body, ctype=ct)
-                aid = (up[0] if isinstance(up, list) else (up.get("items") or up.get("attachments") or [up])[0]).get("id")
+                body, ct = multipart("files", os.path.basename(cvs[0]), open(cvs[0], "rb").read(), {"type": "CV"})
+                up = call("POST", "/attachments/temporary?type=CV", raw=body, ctype=ct)
+                aid = (up[0] if isinstance(up, list) else (up.get("items") or up.get("attachments") or [up])[0])
+                aid = aid.get("attachmentId") or aid.get("id")
                 call("POST", "/attachments/temporary/assign", {"attachments": [{"id": aid, "type": "CV"}], "candidateIds": [cid]}); res["cv"] = "attached"
         # notes: one per conversation + one per pipeline
         existing = call("GET", "/notes?" + urllib.parse.urlencode({"candidateId": cid, "limit": 50})).get("items", []) if cid != "DRY" else []

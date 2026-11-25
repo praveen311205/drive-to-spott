@@ -37,3 +37,9 @@
 - Decision changed to B: all CVs downloaded (scripts/loxo_cvs.py) — 1,501/1,507; 6 failed (accented filenames, downloaded by hand).
   Data zip + 2 CV zips saved by Praveen in the Drive Loxo export folder (restricted, temporary — GDPR). Loxo backup complete.
 - Overlap with Spott: ~340 match by LinkedIn/email (merge), 30 name-only (check), ~1,920 new; 322 broken LinkedIn links.
+- Loxo import: scripts/loxo_plan.py (dry run → state/loxo/plan.jsonl: merge 338 · create 1,414 · check_with_navin 249 ·
+  name_match_check 27 · contact_only 262) and scripts/loxo_import.py (REST API; notes summarised by a haiku agent into
+  state/loxo/*notes_sum*.jsonl). TEST 20 imported 2026-11-25 (state/loxo/test20.json, import_log.jsonl) — awaiting
+  Praveen's review. Before the full run: add "Loxo import" to the Source dropdown; agree note-summary cost (~800 long notes);
+  apply title mapping (scripts/title_map.py) to new Loxo records; then count check vs state/loxo_counts.json.
+- Audit (scripts/audit_standard.py): 36% of 669 meet all checks; gaps LinkedIn 63%, Seniority 70% (no "Unknown" option).
