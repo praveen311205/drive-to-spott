@@ -13,6 +13,14 @@
 - Screening-note batches screen_00..02 (state/screen_prompt.txt): one note + staged conversation fields per person.
   Older than 24 months and not in Spott → status check_with_navin (create nothing).
 
+## Session 2 (2026-11-25) — switched to the Spott REST API (key saved as a network secret for api.gospott.com)
+- scripts/pull_candidates.py → state/spott_candidates.jsonl; scripts/find_dups.py → state/dup_groups.csv
+- scripts/title_map.py (+ state/title_overrides.csv) → Function/Seniority/Segment from parsed titles
+- plan_fields.py → scripts/apply_fields.py (PUT /custom-attributes/candidates/{id}/values/_bulk): 601 Drive candidates written
+- scripts/set_owner.py: owner = Navin (PATCH /candidates/{id} mainContact)
+- Screening/call notes: haiku extraction (state/extract_prompt.txt) → scripts/build_attach_queue.py → scripts/attach_notes.py
+- Report published as a private artifact; Check-with-Navin list in state/check_with_navin.csv
+
 ## Next
 1. Attach the candidate call notes / matched screening docs from state/review_decisions.jsonl (match_confidence high);
    unnamed + low-confidence → review list for Navin. Satispay + Zimpler candidate lists → lookup/create.
