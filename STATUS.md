@@ -34,6 +34,6 @@
 - Loxo API key saved as a network secret for app.loxo.co; agency slug `gtm-talent-b-v`.
 - scripts/loxo_export.py → state/loxo/ (people 2,290 · companies 274 · jobs 29 · person_events 4,789 · CV index: 1,334 people / 1,507 files).
   Backup zip (without CV files) handed to Praveen for the Drive export folder.
-- Decision: option A — CVs go straight Loxo → Spott via both APIs this week (no CV backup). Requires Loxo access to stay
-  active (failed $209 payment must be fixed). Loxo support full-export request is the second safety net.
+- Decision changed to B: all CVs downloaded (scripts/loxo_cvs.py) — 1,501/1,507; 6 failed (accented filenames, downloaded by hand).
+  Data zip + 2 CV zips saved by Praveen in the Drive Loxo export folder (restricted, temporary — GDPR). Loxo backup complete.
 - Overlap with Spott: ~340 match by LinkedIn/email (merge), 30 name-only (check), ~1,920 new; 322 broken LinkedIn links.
