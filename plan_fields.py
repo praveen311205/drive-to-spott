@@ -17,6 +17,7 @@ from collections import defaultdict
 ROOT = os.path.dirname(os.path.abspath(__file__))
 STATE = os.path.join(ROOT, "state")
 INCLUDE_SECTOR = "--include-sector" in sys.argv
+UNKNOWN_FIELDS = {"function", "segment", "work_rights"}
 
 # staging key -> Spott field label
 FIELD_MAP = {
@@ -78,9 +79,13 @@ def main():
                 if key == "sector" and not INCLUDE_SECTOR:
                     continue
                 raw = p.get(key)
-                if raw in (None, "", "unknown", "Unknown", [], ["unknown"]):
-                    continue
                 d = defs.get(label)
+                if raw in (None, "", "unknown", "Unknown", [], ["unknown"]):
+                    # Nav's standard: "filled or marked unknown" — write Unknown where the dropdown offers it
+                    if key in UNKNOWN_FIELDS and d and "Unknown" in (d.get("definition", {}).get("options") or []):
+                        raw = ["Unknown"] if d["viewType"] == "customMultiSelect" else "Unknown"
+                    else:
+                        continue
                 if not d:
                     rejects.append([cid, p.get("key"), label, raw, "field missing in Spott"]); continue
                 vt = d["viewType"]
