@@ -29,3 +29,11 @@
    conversation fields (Base, OTE, Currency, Notice period, Work setup, Work rights, Status, Source,
    Last contact date, Next step) if Spott AI fill owns Function/Seniority/Segment/Sector.
 4. "Check with Navin" list for >24-month people (Sheet preferred over a Spott list), merge list, report.
+
+## Loxo (2026-11-25)
+- Loxo API key saved as a network secret for app.loxo.co; agency slug `gtm-talent-b-v`.
+- scripts/loxo_export.py → state/loxo/ (people 2,290 · companies 274 · jobs 29 · person_events 4,789 · CV index: 1,334 people / 1,507 files).
+  Backup zip (without CV files) handed to Praveen for the Drive export folder.
+- Decision: option A — CVs go straight Loxo → Spott via both APIs this week (no CV backup). Requires Loxo access to stay
+  active (failed $209 payment must be fixed). Loxo support full-export request is the second safety net.
+- Overlap with Spott: ~340 match by LinkedIn/email (merge), 30 name-only (check), ~1,920 new; 322 broken LinkedIn links.
