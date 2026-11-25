@@ -46,6 +46,7 @@ for cid, d in per.items():
             break
         except Exception as e:
             status, msg = "error", str(e)[:300]; time.sleep(2 ** attempt)
+    time.sleep(0.3)
     log.write(json.dumps({"cid": cid, "status": status, "n": len(d), "msg": msg}) + "\n"); log.flush()
     ok += status == "ok"; err += status != "ok"
 print("candidates:", len(per), "| ok:", ok, "| errors:", err, "| previously done:", len(done))
