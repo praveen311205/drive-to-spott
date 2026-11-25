@@ -86,3 +86,14 @@ every profile and groups candidates by (field, value) into a handful of bulk cal
   trucking firms → "Truck Transportation"; generic "mid-market companies" → unknown). Use labels from Spott's
   company_industries list; the planner maps them to the consolidated buckets.
 - Languages / work rights only when stated. Never fill a value just to fill a field.
+
+## v5 — after the Spott bulk CV upload
+The CVs directly in "To import (CVs)" were bulk-uploaded in the Spott app, so most people already have a record
+created from their CV. Per person:
+- Do the duplicate check as usual (LinkedIn → email → "First Last"). Found → treat as existing: fill gaps
+  (name format, LinkedIn, emails/phones), add notes, write the staging profile. Never re-import the CV.
+- If the lookup returns TWO OR MORE candidate records for the same person (e.g. the upload made one per CV copy),
+  do not merge or delete: record status `duplicate_in_spott` with all candidate ids in `detail`, fill gaps on the
+  oldest record only, and use that id in the profile.
+- Not found → import the primary CV as in step 3 (this covers CVs that live in the Migration folder or failed to
+  parse in the bulk upload).
