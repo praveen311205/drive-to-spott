@@ -145,6 +145,9 @@ for r in plan:
                         cid = call("POST", "/candidates/_from-unsupervised-cv", raw=body, ctype=ct).get("id"); res["cv"] = "parsed"
                     except RuntimeError as e: res["issues"] += f" CV parse failed: {str(e)[:120]};"
             if not cid:
+                if not (r["first"] and r["last"]) and r.get("name"):        # Loxo sometimes keeps only the full name
+                    _p = [x for x in r["name"].split() if "@" not in x]
+                    if len(_p) >= 2: r["first"], r["last"] = r["first"] or _p[0], r["last"] or " ".join(_p[1:])
                 fn_ = r["first"] if r["first"] and "@" not in r["first"] else None
                 body = {"firstName": proper(fn_) or "Unknown", "lastName": proper(r["last"]) or "Unknown"}
                 if not fn_: res["issues"] += f" first name missing in Loxo ({r['first']}); set to Unknown;"

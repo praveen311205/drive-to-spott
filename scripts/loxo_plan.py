@@ -59,6 +59,7 @@ for c in C:
     if len(n) >= 2: by_nm.setdefault(n[0] + " " + n[-1], set()).add(c["id"])
 
 out, stats = [], collections.Counter()
+seen_li, seen_em = set(), set()
 for p in people:
     pid = p["id"]
     types = {t.get("name") for t in (p.get("person_types") or [])}
@@ -80,6 +81,7 @@ for p in people:
     n = norm(p.get("name") or f"{p.get('first_name')} {p.get('last_name')}").split()
     if not mid and len(n) >= 2 and n[0] + " " + n[-1] in by_nm: name_hit = sorted(by_nm[n[0] + " " + n[-1]])
     if "Candidate" not in types and "Contact" in types: action = "contact_only"
+    elif (li and li in seen_li) or any(e.lower() in seen_em for e in emails): action = "skip_loxo_duplicate"   # same person twice in Loxo
     elif mid: action = "merge"
     elif name_hit: action = "name_match_check"
     elif last < CUTOFF: action = "check_with_navin"
@@ -116,6 +118,8 @@ for p in people:
            "loxo_description": text(p.get("description"))[:1500], "comp_notes": p.get("compensation_notes")}
     out.append(rec)
     stats[action] += 1
+    if li: seen_li.add(li)
+    seen_em.update(e.lower() for e in emails)
 with open(os.path.join(L, "plan.jsonl"), "w") as fh:
     for r in out: fh.write(json.dumps(r) + "\n")
 print("actions:", dict(stats))
