@@ -63,7 +63,8 @@ logp = os.path.join(L, "post_log.jsonl")
 done = {json.loads(l)["loxo_id"] for l in open(logp) if json.loads(l)["status"] == "ok"} if os.path.exists(logp) else set()
 log = open(logp, "a")
 src_ok = "Loxo import" in ((defs.get("Source") or {}).get("definition") or {}).get("options", [])
-for l in open(os.path.join(L, "import_log.jsonl")):
+import glob as _g
+for l in [x for lf in sorted(_g.glob(os.path.join(L, "import_log*.jsonl"))) if "dry" not in lf for x in open(lf)]:
     imp = json.loads(l)
     if imp["status"] != "ok" or imp["loxo_id"] in done: continue
     r = plan[imp["loxo_id"]]; cid = imp["candidate_id"]

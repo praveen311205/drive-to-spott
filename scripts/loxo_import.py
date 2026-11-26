@@ -108,12 +108,19 @@ for f in glob.glob(os.path.join(L, "*notes_sum*.jsonl")) + glob.glob(os.path.joi
     for l in open(f):
         if l.strip():
             r = json.loads(l); sums[(r["loxo_id"], r["i"])] = r
-logp = os.path.join(L, "import_log_dry.jsonl" if DRY else "import_log.jsonl")
-done = {json.loads(l)["loxo_id"] for l in open(logp) if json.loads(l)["status"] != "error"} if os.path.exists(logp) else set()
+SHARD = sys.argv[sys.argv.index("--shard") + 1] if "--shard" in sys.argv else None      # "k/N": process loxo_id % N == k
+logp = os.path.join(L, "import_log_dry.jsonl" if DRY else (f"import_log_s{SHARD.split('/')[0]}.jsonl" if SHARD else "import_log.jsonl"))
+done = set()
+for lf in glob.glob(os.path.join(L, "import_log*.jsonl")):
+    if "dry" in lf: continue
+    for l in open(lf):
+        x = json.loads(l)
+        if x["status"] != "error": done.add(x["loxo_id"])
 log = open(logp, "a")
 for r in plan:
     if IDS is not None and r["loxo_id"] not in IDS: continue
     if r["action"] not in ("merge", "create") or r["loxo_id"] in done: continue
+    if SHARD and r["loxo_id"] % int(SHARD.split("/")[1]) != int(SHARD.split("/")[0]): continue
     if any((r["loxo_id"], i) not in sums for i in range(len(r["notes"]))):
         continue                                   # wait until every note of this person is summarised
     res = {"loxo_id": r["loxo_id"], "name": r["name"], "action": r["action"], "status": None, "candidate_id": None,
