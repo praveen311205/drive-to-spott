@@ -43,3 +43,7 @@
   Praveen's review. Before the full run: add "Loxo import" to the Source dropdown; agree note-summary cost (~800 long notes);
   apply title mapping (scripts/title_map.py) to new Loxo records; then count check vs state/loxo_counts.json.
 - Audit (scripts/audit_standard.py): 36% of 669 meet all checks; gaps LinkedIn 63%, Seniority 70% (no "Unknown" option).
+- Loxo import DONE 2026-11-26: 2,290 accounted (1,751 imported: 338 merged, 1,413 created; 249 check_with_navin; 27 name checks;
+  262 contacts; 1 Loxo duplicate). 235 "Unknown Unknown" renamed; 21 empty shells deleted (with Praveen's OK); 32 pairs merged by
+  Praveen. Duplicate check clean (only Edward Weeks = two people). Spott: 2,046 candidates.
+- Open: Source "Loxo import" option (Praveen), review list (state/review_list.csv), Check-with-Navin 482, Metaview, companies/contacts.
