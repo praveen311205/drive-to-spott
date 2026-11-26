@@ -46,9 +46,15 @@ def multipart(field, fname, blob, extra=None):
     return body, f"multipart/form-data; boundary={b}"
 
 
-def e164(p):
+CC = {"France": "33", "Germany": "49", "United Kingdom": "44", "UK": "44", "Netherlands": "31", "Sweden": "46", "Spain": "34",
+      "Italy": "39", "Belgium": "32", "Switzerland": "41", "Austria": "43", "Portugal": "351", "Ireland": "353", "Denmark": "45",
+      "Norway": "47", "Poland": "48", "Finland": "358"}
+
+
+def e164(p, country=None):
     d = re.sub(r"[^\d+]", "", p or "")
     if d.startswith("00"): d = "+" + d[2:]
+    if not d.startswith("+") and d.startswith("0") and CC.get(country or ""): d = "+" + CC[country] + d[1:]
     return d if d.startswith("+") and 9 <= len(d) <= 16 else None
 
 
@@ -61,7 +67,8 @@ defs = {}
 for d in sorted(json.load(open(os.path.join(S, "custom_fields.json")))["custom_fields_candidate"]["items"], key=lambda d: d.get("createdAt") or ""):
     defs[d["label"]] = d
 FMAP = {"base": "Base", "ote": "OTE", "currency": "Currency", "notice_period": "Notice period", "work_setup": "Work setup",
-        "status": "Status", "last_contact_date": "Last contact date", "languages": "Language"}
+        "status": "Status", "last_contact_date": "Last contact date", "languages": "Language", "work_rights": "Work rights",
+        "next_step": "Next step", "rip_and_replace": "Rip-and-replace", "rip_and_replace_incumbent": "Rip-and-replace incumbent"}
 LANG = {"Swedish": "Nordic (Swedish/Danish/Norwegian)", "Danish": "Nordic (Swedish/Danish/Norwegian)", "Norwegian": "Nordic (Swedish/Danish/Norwegian)"}
 
 
@@ -85,6 +92,10 @@ def attrs(fields, existing):
             if good: out.append({"attributeDefinitionId": d["id"], "value": {"viewType": vt, "multiSelect": sorted(set((cur or []) + good))}})
         elif vt == "customNumber":
             out.append({"attributeDefinitionId": d["id"], "value": {"viewType": vt, "number": float(v)}})
+        elif vt == "customCheckbox":
+            if isinstance(v, bool): out.append({"attributeDefinitionId": d["id"], "value": {"viewType": vt, "checked": v}})
+        elif vt == "customText":
+            out.append({"attributeDefinitionId": d["id"], "value": {"viewType": vt, "text": str(v)[:500]}})
         elif vt == "customDate":
             if cur and isinstance(cur, str) and cur >= str(v)[:10]: continue      # keep a later last-contact date
             out.append({"attributeDefinitionId": d["id"], "value": {"viewType": vt, "date": str(v)[:10]}})
@@ -93,7 +104,7 @@ def attrs(fields, existing):
 
 plan = [json.loads(l) for l in open(os.path.join(L, "plan.jsonl"))]
 sums = {}
-for f in glob.glob(os.path.join(L, "*notes_sum*.jsonl")):
+for f in glob.glob(os.path.join(L, "*notes_sum*.jsonl")) + glob.glob(os.path.join(L, "nbatch", "*_sum.jsonl")):
     for l in open(f):
         if l.strip():
             r = json.loads(l); sums[(r["loxo_id"], r["i"])] = r
@@ -103,6 +114,8 @@ log = open(logp, "a")
 for r in plan:
     if IDS is not None and r["loxo_id"] not in IDS: continue
     if r["action"] not in ("merge", "create") or r["loxo_id"] in done: continue
+    if any((r["loxo_id"], i) not in sums for i in range(len(r["notes"]))):
+        continue                                   # wait until every note of this person is summarised
     res = {"loxo_id": r["loxo_id"], "name": r["name"], "action": r["action"], "status": None, "candidate_id": None,
            "contacts_added": [], "cv": None, "notes_added": 0, "pipeline_notes": 0, "fields": 0, "issues": ""}
     try:
@@ -134,7 +147,7 @@ for r in plan:
                               [{"email": e, "purpose": "personal", "isPrimary": not have_e and i == 0} for i, e in enumerate(new_e)]
         have_p = [re.sub(r"\D", "", p["phoneNumber"])[-9:] for p in rec["phoneNumbers"]["phoneNumbers"]]
         new_p = []
-        for p in map(e164, r["phones"]):
+        for p in (e164(x, r.get("country")) for x in r["phones"]):
             if p and re.sub(r"\D", "", p)[-9:] not in have_p + [re.sub(r"\D", "", x)[-9:] for x in new_p]: new_p.append(p)
         if new_p:
             patch["phoneNumbers"] = [{"phoneNumber": p["phoneNumber"], "purpose": p.get("purpose") or "personal", "isPrimary": p.get("isPrimary", False)} for p in rec["phoneNumbers"]["phoneNumbers"]] + \

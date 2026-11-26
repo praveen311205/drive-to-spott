@@ -39,21 +39,26 @@ def seg(t):
     if has(t, r"mid[- ]?market", r"\bmm\b", r"\bmid\b"): s.append("Mid-market")
     if has(t, r"enterprise", r"strategic", r"major accounts?", r"global accounts?", r"key accounts?", r"large accounts?", r"corporate accounts?"): s.append("Enterprise")
     return s
-over = {}
-p = os.path.join(S, "title_overrides.csv")
-if os.path.exists(p):
-    for r in csv.DictReader(open(p)): over[r["title"]] = r
-rows, unk = [], 0
-for line in open(os.path.join(S, "titles.tsv")):
-    cnt, title = line.rstrip("\n").split("\t", 1)
-    if title == "NONE": continue
-    t = title.lower()
-    if title in over:
-        o = over[title]; f, s_, g = o["function"], o["seniority"], [x for x in o["segment"].split("|") if x]; src = "override"
-    else:
-        f = fn(t); s_ = sen(t, f); g = seg(t) if f in ("AE", "Founding AE", "SDR/BDR", "AM/CSM", "Sales Engineer", "Sales Leader") else []; src = "rule"
-    unk += f == "Unknown"
-    rows.append([title, cnt, f, s_, "|".join(g), src])
-with open(os.path.join(S, "title_map.csv"), "w", newline="") as fh:
-    w = csv.writer(fh); w.writerow(["title", "count", "function", "seniority", "segment", "source"]); w.writerows(rows)
-print("titles", len(rows), "| function unknown", unk)
+def main():
+    over = {}
+    p = os.path.join(S, "title_overrides.csv")
+    if os.path.exists(p):
+        for r in csv.DictReader(open(p)): over[r["title"]] = r
+    rows, unk = [], 0
+    for line in open(os.path.join(S, "titles.tsv")):
+        cnt, title = line.rstrip("\n").split("\t", 1)
+        if title == "NONE": continue
+        t = title.lower()
+        if title in over:
+            o = over[title]; f, s_, g = o["function"], o["seniority"], [x for x in o["segment"].split("|") if x]; src = "override"
+        else:
+            f = fn(t); s_ = sen(t, f); g = seg(t) if f in ("AE", "Founding AE", "SDR/BDR", "AM/CSM", "Sales Engineer", "Sales Leader") else []; src = "rule"
+        unk += f == "Unknown"
+        rows.append([title, cnt, f, s_, "|".join(g), src])
+    with open(os.path.join(S, "title_map.csv"), "w", newline="") as fh:
+        w = csv.writer(fh); w.writerow(["title", "count", "function", "seniority", "segment", "source"]); w.writerows(rows)
+    print("titles", len(rows), "| function unknown", unk)
+
+
+if __name__ == "__main__":
+    main()
