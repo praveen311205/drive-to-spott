@@ -141,7 +141,7 @@ for r in plan:
                                     [{"phoneNumber": p, "purpose": "personal", "isPrimary": not have_p and i == 0} for i, p in enumerate(new_p)]
         if r["linkedin"] and not any(s.get("type") == "LINKEDIN" for s in rec["socialMedia"]["socialMedia"]):
             patch["socialMedia"] = [{"url": s["url"], "type": s["type"]} for s in rec["socialMedia"]["socialMedia"]] + [{"url": r["linkedin"], "type": "LINKEDIN"}]
-        if "Contact" in r["types"] and r["action"] == "merge" and rec.get("isVisibleIfClientContact") is False:
+        if r["action"] == "merge" and rec.get("hasClientContacts") and rec.get("isVisibleIfClientContact") is False:
             patch["visibleIfClientContact"] = True      # candidate + client contact: keep them in the Candidates list (Praveen, 26 Nov)
         if r["action"] == "create":
             patch["mainContact"] = {"userId": NAVIN}
