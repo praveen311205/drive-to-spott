@@ -47,3 +47,6 @@
   262 contacts; 1 Loxo duplicate). 235 "Unknown Unknown" renamed; 21 empty shells deleted (with Praveen's OK); 32 pairs merged by
   Praveen. Duplicate check clean (only Edward Weeks = two people). Spott: 2,046 candidates.
 - Open: Source "Loxo import" option (Praveen), review list (state/review_list.csv), Check-with-Navin 482, Metaview, companies/contacts.
+- 2026-11-26 wrap-up: audit 14% all checks (35% excl. Source on hold; 48% excl. Source+Seniority). Migration-folder CVs:
+  all but 4 already in Spott; Todd Jenkins imported; Magrin + Meddah → Check with Navin; Renato Freitas → review (possible
+  ex-freelancer). Source field ON HOLD: must mean original channel (not "Drive/Loxo import") — awaiting Nav's decision.
