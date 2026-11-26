@@ -25,7 +25,7 @@ def call(method, path, body=None, raw=None, ctype="application/json"):
     if DRY and method != "GET": return {"id": "DRY"}
     data = raw if raw is not None else (json.dumps(body).encode() if body is not None else None)
     req = urllib.request.Request(API + path, method=method, data=data, headers={"x-api-key": "proxy-injected", "Content-Type": ctype})
-    for a in range(5):
+    for a in range(8):
         try:
             r = urllib.request.urlopen(req, timeout=120).read(); time.sleep(0.3)
             if not r: return {}
@@ -34,7 +34,8 @@ def call(method, path, body=None, raw=None, ctype="application/json"):
                 m = re.search(rb"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}", r)
                 return {"id": m.group(0).decode()} if m else {"_raw": r[:200].decode(errors="ignore")}
         except urllib.error.HTTPError as e:
-            if e.code in (429, 500, 502, 503, 504) and a < 4: time.sleep(2 ** a + 1); continue
+            if e.code == 429 and a < 7: time.sleep(min(90, 5 * 2 ** a)); continue
+            if e.code in (500, 502, 503, 504) and a < 4: time.sleep(2 ** a + 1); continue
             raise RuntimeError(f"{method} {path} -> {e.code} {e.read()[:300].decode(errors='ignore')}")
 
 
