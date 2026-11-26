@@ -111,12 +111,13 @@ for f in glob.glob(os.path.join(L, "*notes_sum*.jsonl")) + glob.glob(os.path.joi
             r = json.loads(l); sums[(r["loxo_id"], r["i"])] = r
 SHARD = sys.argv[sys.argv.index("--shard") + 1] if "--shard" in sys.argv else None      # "k/N": process loxo_id % N == k
 logp = os.path.join(L, "import_log_dry.jsonl" if DRY else (f"import_log_s{SHARD.split('/')[0]}.jsonl" if SHARD else "import_log.jsonl"))
-done = set()
+done, prev_cid = set(), {}
 for lf in glob.glob(os.path.join(L, "import_log*.jsonl")):
     if "dry" in lf: continue
     for l in open(lf):
         x = json.loads(l)
         if x["status"] != "error": done.add(x["loxo_id"])
+        elif x.get("candidate_id") and x.get("action") == "create": prev_cid[x["loxo_id"]] = x["candidate_id"]
 log = open(logp, "a")
 for r in plan:
     if IDS is not None and r["loxo_id"] not in IDS: continue
@@ -132,6 +133,8 @@ for r in plan:
         if r["action"] == "merge":
             cid = r["spott_ids"][0]
             if len(r["spott_ids"]) > 1: res["issues"] += f" duplicates in Spott {r['spott_ids']};"
+        elif prev_cid.get(r["loxo_id"]):
+            cid = prev_cid[r["loxo_id"]]; res["issues"] += " reused record from earlier attempt;"
         else:
             cid = None
             for p in cvs[:1]:
@@ -142,7 +145,9 @@ for r in plan:
                         cid = call("POST", "/candidates/_from-unsupervised-cv", raw=body, ctype=ct).get("id"); res["cv"] = "parsed"
                     except RuntimeError as e: res["issues"] += f" CV parse failed: {str(e)[:120]};"
             if not cid:
-                body = {"firstName": proper(r["first"]) or "Unknown", "lastName": proper(r["last"]) or "Unknown"}
+                fn_ = r["first"] if r["first"] and "@" not in r["first"] else None
+                body = {"firstName": proper(fn_) or "Unknown", "lastName": proper(r["last"]) or "Unknown"}
+                if not fn_: res["issues"] += f" first name missing in Loxo ({r['first']}); set to Unknown;"
                 cid = call("POST", "/candidates", body).get("id")
         res["candidate_id"] = cid
         rec = call("GET", f"/candidates/{cid}") if cid and cid != "DRY" else {"emails": {"emails": []}, "phoneNumbers": {"phoneNumbers": []}, "socialMedia": {"socialMedia": []}, "name": {}, "customAttributes": []}
@@ -169,8 +174,26 @@ for r in plan:
             fn, ln = rec["name"].get("firstName"), rec["name"].get("lastName")
             if fn and (fn.isupper() or fn.islower()): patch["firstName"] = proper(fn)
             if ln and (ln.isupper() or ln.islower()): patch["lastName"] = proper(ln)
-        if patch:
-            call("PATCH", f"/candidates/{cid}", patch); res["contacts_added"] = sorted(k for k in patch if k != "mainContact")
+        for attempt in range(3):
+            if not patch: break
+            try:
+                call("PATCH", f"/candidates/{cid}", patch); res["contacts_added"] = sorted(k for k in patch if k != "mainContact"); break
+            except RuntimeError as e:
+                msg = str(e)
+                if "409" in msg:
+                    taken = re.findall(r'"identifier":"([^"]+)"[^}]*"takenBy":\{"name":"([^"]*)","id":"([^"]+)"', msg)
+                    for ident, who, wid in taken:
+                        res["issues"] += f" contact {ident} already on {who} ({wid}) - not added, check;"
+                    bad = {t[0].lower() for t in taken}
+                elif "phoneNumber" in msg:
+                    idx = [int(i) for i in re.findall(r"phoneNumbers\[(\d+)\]", msg)]
+                    bad = {patch["phoneNumbers"][i]["phoneNumber"].lower() for i in idx if i < len(patch.get("phoneNumbers", []))}
+                    res["issues"] += f" invalid phone(s) {sorted(bad)} not added;"
+                else:
+                    raise
+                if not bad: raise
+                if "emails" in patch: patch["emails"] = [x for x in patch["emails"] if x["email"].lower() not in bad]
+                if "phoneNumbers" in patch: patch["phoneNumbers"] = [x for x in patch["phoneNumbers"] if x["phoneNumber"].lower() not in bad and re.sub(r"\D", "", x["phoneNumber"]) not in {re.sub(r"\D", "", b) for b in bad}]
         # CV for merged records that have none
         if r["action"] == "merge" and cvs:
             att = call("GET", "/attachments?" + urllib.parse.urlencode({"candidateId": cid})).get("items", [])
