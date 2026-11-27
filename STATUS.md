@@ -55,3 +55,7 @@
   44 linked to existing candidate records, 2 already contacts, 25 without company → review list (section 7).
   Note: live POST /clients needs description (string), size (null ok) and specialties ([]) despite the docs.
 - Source field: 762 LinkedIn outreach, 95 Other, 1 Inbound; "Drive import" cleared. Referral/inbound pass waits for Metaview.
+- 2026-11-27 Metaview (API key = network secret for mcp.metaview.ai; tools via scripts/mv_client.py). 6 AI fields "Migration – …"
+  created in the Metaview workspace (delete when done). 1,234 calls categorised; applied with scripts/metaview_apply.py:
+  628 candidate calls matched (775 notes), 183 new candidates, 86 company calls (55 matched, 31 new Prospects), sources
+  44 Referral / 29 Inbound / 5 Event / 26 LinkedIn / 60 Other. Review: 166 first-name-only, 20 unidentified, 24 >24m, 4 no company.

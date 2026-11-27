@@ -47,6 +47,15 @@ if os.path.exists(f"{L}/company_log.jsonl"):
     for x in last.values():
         if x["kind"] == "contact" and x["status"] == "review":
             add("7. Loxo contact without a company", x["name"], "", x["issues"], "Add their company in Spott, or skip")
+if os.path.exists(f"{S}/metaview/apply_log.jsonl"):
+    mlast = {}
+    for l in open(f"{S}/metaview/apply_log.jsonl"):
+        x = json.loads(l); mlast[x["conv"]] = x
+    for x in mlast.values():
+        if x["status"] in ("review", "error"):
+            add("8. Metaview call not imported", "", "", f"{x['how'] or 'error'}: {x['issues'][:220]}",
+                "Navin: who is this? (add full name) / older than 24 months: yes-no" if x["kind"] == "candidate" else "Which company?")
+add("6. Small fix", "Aaron Shaw", "01a21d7d-45a6-7d8f-b3da-d28280f952ad / 01a21d7d-e7cc-726a-91a3-bae61d0b541e", "Two different people (different LinkedIn)", "Leave as is; never merge")
 add("6. Small fix", "Sam Kenney-Herbert", "01a211d1-02fd-7403-94e7-fd5f2974faa8", "Two notes titled 2026-09-14 – Doc after the merge", "Delete one")
 add("6. Small fix", "Ross Delahunty", "01a20d05-825c-71f0-b203-560ea87fd935", "Long pilot note in the old format", "Delete it (the new standard note is there)")
 add("6. Small fix", "Edward Weeks", "01a211c8-e9c2-75e4-9eb6-ed2dca662bba / 01a211d8-585f-7884-9ae7-88bc71db53e8", "Two different people (Tipalti AE, Dataiku AE)", "Leave as is; never merge")
