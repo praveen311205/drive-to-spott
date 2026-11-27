@@ -100,12 +100,11 @@ for n, t in targets.items():
             if t["stage"] != "Lead" and cur in (None, "Lead"):
                 call("PATCH", f"/clients/{ex['id']}", {"stageId": STAGE[t["stage"]]}); rec["how"] = f"existing, stage {cur}->{t['stage']}"
         else:
-            body = {"name": t["name"]}
-            if t["domain"]: body["domain"] = t["domain"]
-            if t["description"]: body["description"] = t["description"]
+            body = {"name": t["name"], "description": t["description"] or "", "domain": t["domain"], "foundedYear": None,
+                    "industry": None, "size": None, "specialties": []}   # the live API requires these keys
             try: rec["id"] = call("POST", "/clients", body).get("id")
             except RuntimeError as e:
-                if "domain" in str(e): body.pop("domain", None); rec["id"] = call("POST", "/clients", body).get("id"); rec["issues"] += " domain rejected;"
+                if "domain" in str(e): body["domain"] = None; rec["id"] = call("POST", "/clients", body).get("id"); rec["issues"] += " domain rejected;"
                 else: raise
             rec["how"] = "created"
             if t["stage"] != "Lead": call("PATCH", f"/clients/{rec['id']}", {"stageId": STAGE[t["stage"]]})

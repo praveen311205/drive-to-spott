@@ -40,6 +40,13 @@ for r in att.values():
 for r in (json.loads(l) for l in open(f"{S}/review_items.jsonl")):
     add("5. Drive file", r.get("person_name") or "", "", f"{r['kind']}: {r['title']} {r.get('notes') or ''}"[:250], "Sensitive: never import. Lists/reference: decide")
 add("5. Drive file", "Renato Freitas", "", "CV in Migration folder (Dec 2024); possibly the former GTM Talent freelancer (renato@gtmtalent.tech)", "Import as candidate or skip")
+if os.path.exists(f"{L}/company_log.jsonl"):
+    last = {}
+    for l in open(f"{L}/company_log.jsonl"):
+        x = json.loads(l); last[x["key"]] = x
+    for x in last.values():
+        if x["kind"] == "contact" and x["status"] == "review":
+            add("7. Loxo contact without a company", x["name"], "", x["issues"], "Add their company in Spott, or skip")
 add("6. Small fix", "Sam Kenney-Herbert", "01a211d1-02fd-7403-94e7-fd5f2974faa8", "Two notes titled 2026-09-14 – Doc after the merge", "Delete one")
 add("6. Small fix", "Ross Delahunty", "01a20d05-825c-71f0-b203-560ea87fd935", "Long pilot note in the old format", "Delete it (the new standard note is there)")
 add("6. Small fix", "Edward Weeks", "01a211c8-e9c2-75e4-9eb6-ed2dca662bba / 01a211d8-585f-7884-9ae7-88bc71db53e8", "Two different people (Tipalti AE, Dataiku AE)", "Leave as is; never merge")

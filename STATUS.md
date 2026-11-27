@@ -50,3 +50,8 @@
 - 2026-11-26 wrap-up: audit 14% all checks (35% excl. Source on hold; 48% excl. Source+Seniority). Migration-folder CVs:
   all but 4 already in Spott; Todd Jenkins imported; Magrin + Meddah → Check with Navin; Renato Freitas → review (possible
   ex-freelancer). Source field ON HOLD: must mean original channel (not "Drive/Loxo import") — awaiting Nav's decision.
+- 2026-11-27 Loxo companies/contacts (scripts/loxo_companies.py): 288 companies created + 7 matched (Spott now 323:
+  Customer = Satispay, Oper, light.inc; Lost Customer = 11 incl. Choco, TOPO, Dotfile; rest Lead). Contacts: 243 created,
+  44 linked to existing candidate records, 2 already contacts, 25 without company → review list (section 7).
+  Note: live POST /clients needs description (string), size (null ok) and specialties ([]) despite the docs.
+- Source field: 762 LinkedIn outreach, 95 Other, 1 Inbound; "Drive import" cleared. Referral/inbound pass waits for Metaview.
