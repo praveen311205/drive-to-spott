@@ -3,3 +3,4 @@ state/
 batches/
 *.pdf
 *.docx
+__pycache__/
